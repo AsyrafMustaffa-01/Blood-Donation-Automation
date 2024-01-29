@@ -5,3 +5,35 @@
 2024-01-29 21:42:21.756251 - script successfully run 
 2024-01-29 21:45:15.546497 - script successfully run 
 2024-01-29 21:47:07.023912 - script successfully run 
+2024-01-29 21:58:42.391049 - script successfully run 
+Traceback (most recent call last):
+  File "C:\Users\PC\anaconda3\envs\MLOps\Lib\site-packages\pandas\core\indexes\base.py", line 3791, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 152, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 181, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\_libs\hashtable_class_helper.pxi", line 7080, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\_libs\hashtable_class_helper.pxi", line 7088, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'daily'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\PC\OneDrive - Universiti Malaya\Documents\Github Project\Blood-Donation-Automation\Automation\Automation.py", line 193, in <module>
+    monthly_highest_value_index = monthly_summary['daily'].idxmax()
+                                  ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\PC\anaconda3\envs\MLOps\Lib\site-packages\pandas\core\series.py", line 1040, in __getitem__
+    return self._get_value(key)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\anaconda3\envs\MLOps\Lib\site-packages\pandas\core\series.py", line 1156, in _get_value
+    loc = self.index.get_loc(label)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\anaconda3\envs\MLOps\Lib\site-packages\pandas\core\indexes\base.py", line 3798, in get_loc
+    raise KeyError(key) from err
+KeyError: 'daily'
+2024-01-29 22:14:19.972714 - 'daily'
+2024-01-29 22:17:43.245592 - script successfully run 
+2024-01-29 22:21:11.924911 - script successfully run 
+2024-01-29 22:23:46.428471 - script successfully run 
+2024-01-30 01:22:46.226915 - script successfully run 
+2024-01-30 01:24:40.970137 - script successfully run 

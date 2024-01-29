@@ -8,28 +8,41 @@ from sklearn.linear_model import LinearRegression
 import numpy as np
 import traceback
 
-# sendPhoto_bot_url = "https://api.telegram.org/bot6905941845:AAEE8qD7HZ0GJYO5BT6kvoATAi1jFBFGF0g/sendPhoto"
+# open log file
 file = open(r'C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\telegram bot\\log.txt', 'a')
+# telegram bot token
 bot_token = "6905941845:AAEE8qD7HZ0GJYO5BT6kvoATAi1jFBFGF0g"
+# chat id for the group
 chat_id = "-4171022632"
+
+# function to send photo to telegram group
 def send_photo(bot_token, chat_id, photo_path, caption):
     send_photo_bot_url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
     photo = {"photo": open(photo_path, 'rb')}
     parameters = {
         "chat_id": chat_id,
-        "caption": caption
+        "caption": caption,
+        "parse_mode": "Markdown",
     }
     response = requests.post(send_photo_bot_url, data=parameters, files=photo)
     return response.json()
+
+# try catch sequence
 try:
     # Load the GeoJSON file
     gdf_states = gpd.read_file("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\GeoJSON Malaysia\\malaysia_singapore_brunei_State level 1.geojson")
+    # raw data for daily donation
     daily_donation_data = pd.read_csv("https://raw.githubusercontent.com/MoH-Malaysia/data-darah-public/main/donations_state.csv")
+    # raw data for returning donor
     returning_donor_data = pd.read_parquet("https://dub.sh/ds-data-granular")
+    # slice daily donation data with only Malaysia
     malaysia_data = daily_donation_data[daily_donation_data['state']=='Malaysia']
+    # slice daily donation data with only Malaysia States
     malaysia_states_data = daily_donation_data[daily_donation_data['state'] != 'Malaysia']
+    # change datatype to datetime
     malaysia_states_data['date'] = pd.to_datetime(malaysia_states_data['date'])
 
+    # calculating return vs all donor
     returning_donor = returning_donor_data.loc[returning_donor_data["donor_id"].duplicated()]
     all_donor = int(returning_donor_data['donor_id'].nunique())
     returning_donor_count = int(returning_donor['donor_id'].nunique())
@@ -38,7 +51,10 @@ try:
 
     distinct_donor_data['visit_date'] = pd.to_datetime(distinct_donor_data['visit_date'])
     distinct_donor_data['Age'] = distinct_donor_data['visit_date'].dt.year - distinct_donor_data['birth_date']
+    
+    # PLOT HISTOGRAM RETURN DONOR
 
+    # initialize bin 
     bin_edges = range(0, 110, 10)
     # Create the histogram
     plt.hist(distinct_donor_data['Age'], bins=bin_edges)
@@ -51,6 +67,7 @@ try:
     # Save the histogram as a PNG image
     plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\age_demographic_of_returning_donor.png")
 
+    # calculate percentage of donor return / all donor
     percentage_return = returning_donor_count / all_donor * 100
     percentage_return = round(percentage_return, 2)
 
@@ -70,6 +87,9 @@ try:
     # Frequency max bin
     highest_frequency= histogram_data['frequency'].max()
 
+    # PLOT DAILY DATA
+
+    # create subset of 30 days prior data
     last_30days_data_malaysia = malaysia_data.tail(30)
 
     # Change 'date' datatype to datetime
@@ -86,11 +106,13 @@ try:
         'Day of the Week': daily_summary.index,
         'Mean Daily Value': daily_summary.values
     })
+    # calculating day highest and lowest value
     day_highest_value = daily_summary.idxmax()
-    highest_value_daily = daily_summary.max()
+    highest_value_daily = round(daily_summary.max())
     day_lowest_value = daily_summary.idxmin()
-    lowest_value_daily = daily_summary.min()
+    lowest_value_daily = round(daily_summary.min())
 
+    # create line area plot for daily data
     plt.figure(figsize=(18, 10))
     plt.plot(last_30days_data_malaysia['date'], last_30days_data_malaysia['daily'], color='red', linestyle='-', linewidth=2)
     plt.fill_between(last_30days_data_malaysia['date'], last_30days_data_malaysia['daily'], color = 'lightcoral')
@@ -103,6 +125,9 @@ try:
     # save plot
     pic_daily_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\daily_trends_of_blood_donor_for_past_week.png")
 
+    # PLOT WEEKLY DATA
+
+    # make a copy dataframe
     copy_malaysia_data = malaysia_data.copy()
     # Change 'date' datatype to datetime
     copy_malaysia_data['date'] = pd.to_datetime(copy_malaysia_data['date'])
@@ -116,11 +141,11 @@ try:
     data_weekly_subset = data_weekly.tail(52)
 
     # Calculate highest, lowest value for weekly
-    highest_donor_weekly_index = data_weekly_subset['date'].idxmax()
-    highest_donor_weekly_value =  round(data_weekly_subset['daily'].max(), 2)
-    date_highest_donor_weekly = data_weekly.loc[highest_donor_weekly_index, 'date'].week
-    lowest_donor_weekly_index = data_weekly_subset['date'].idxmin()
-    lowest_donor_weekly_value =  round(data_weekly_subset['daily'].min(), 2)
+    highest_donor_weekly_index = data_weekly_subset['daily'].idxmax()
+    highest_donor_weekly_value =  round(data_weekly_subset['daily'].max())
+    date_highest_donor_weekly = data_weekly_subset.loc[highest_donor_weekly_index, 'date'].week
+    lowest_donor_weekly_index = data_weekly_subset['daily'].idxmin()
+    lowest_donor_weekly_value =  round(data_weekly_subset['daily'].min())
     date_lowest_donor_weekly = data_weekly_subset.loc[lowest_donor_weekly_index, 'date'].week
 
     # Extract date and value columns
@@ -140,13 +165,13 @@ try:
     trend_slope_w = model_w.coef_[0][0]
     # Interpretation based on trend slope
     if trend_slope_w > 0:
-        trend_interpretation_w = "Based on the Trend Line, there are increasing trend of blood donation by weekly for the past year in Malaysia."
+        trend_interpretation_w = "Based on the Trend Line, there are *increasing trend* of blood donation by weekly for the past year in Malaysia."
     elif trend_slope_w < 0:
-        trend_interpretation_w = "Based on the Trend Line, there are decreasing trend of blood donation by weekly for the past year in Malaysia."
+        trend_interpretation_w = "Based on the Trend Line, there are *decreasing trend* of blood donation by weekly for the past year in Malaysia."
     else:
         trend_interpretation_w = "No significant trend observed of blood donation by weekly for the past year in Malaysia."
 
-    # Create the plot with Matplotlib
+    # Create the line area plot with Matplotlib
     plt.figure(figsize=(15, 5))
     plt.plot(dates_w, values_w, linestyle='-', color='red', label='Blood Donor Weekly Mean')
     plt.plot(dates_w, trend_line_w, linestyle='--', color='blue', label='Trend Line')
@@ -163,8 +188,10 @@ try:
     # Save plot
     pic_weekly_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\weekly_trends_of_blood_donor_for_past_year.png")
 
-    # Identify numeric columns excluding 'object' columns
-    numeric_columns = copy_malaysia_data.select_dtypes(exclude='object').columns
+    # PLOT MONTHLY DATA
+
+    # # Identify numeric columns excluding 'object' columns
+    # numeric_columns = copy_malaysia_data.select_dtypes(exclude='object').columns
 
     # Resample data and calculate monthly sum
     data_monthly = copy_malaysia_data[numeric_columns].resample('M').sum().reset_index()
@@ -179,9 +206,9 @@ try:
     monthly_summary = data_monthly_subset.groupby('Month')['daily'].mean()
     # Calculate monthly highest, lowest donor value
     monthly_highest_value_index = monthly_summary.idxmax()
-    highest_value_monthly = round(monthly_summary.max(),2)
+    highest_value_monthly = round(monthly_summary.max())
     monthly_lowest_value_index = monthly_summary.idxmin()
-    lowest_value_monthly = round(monthly_summary.min(), 2)
+    lowest_value_monthly = round(monthly_summary.min())
     # Extract date and value columns
     dates_m = data_monthly_subset['date']
     values_m = data_monthly_subset['daily']
@@ -199,13 +226,13 @@ try:
 
     # Interpretation based on trend slope
     if trend_slope_m > 0:
-        trend_interpretation_m = "Based on the Trend Line, there are increasing trend of blood donation by Monthly for the past 10 years in Malaysia."
+        trend_interpretation_m = "Based on the Trend Line, there are **increasing trend** of blood donation by Monthly for the past 10 years in Malaysia."
     elif trend_slope_m < 0:
-        trend_interpretation_m = "Based on the Trend Line, there are decreasing trend of blood donation by Monthly for the past 10 years in Malaysia."
+        trend_interpretation_m = "Based on the Trend Line, there are **decreasing trend** of blood donation by Monthly for the past 10 years in Malaysia."
     else:
         trend_interpretation_m = "No significant trend found throughout monthly donor as it remain same. KKM need to step up blood donation campaign."
 
-    # Create the plot with Matplotlib
+    # Create the line area plot with Matplotlib
     plt.figure(figsize=(15, 5))
     plt.plot(dates_m, values_m, linestyle='-', color='red', label='Blood Donor Monthly Mean')
     plt.plot(dates_m, trend_line_m, linestyle='--', color='blue', label='Trend Line')
@@ -222,8 +249,10 @@ try:
     # save plot
     pic_montly_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\monthly_trends_of_blood_donor_for_10_years.png")
 
-    # Identify numeric columns excluding 'object' columns
-    numeric_columns = copy_malaysia_data.select_dtypes(exclude='object').columns
+    # PLOT YEARLY DATA
+
+    # # Identify numeric columns excluding 'object' columns
+    # numeric_columns = copy_malaysia_data.select_dtypes(exclude='object').columns
 
     # Resample data and calculate monthly mean
     data_yearly = copy_malaysia_data[numeric_columns].resample('Y').sum().reset_index()
@@ -268,9 +297,9 @@ try:
     # save plot
     pic_yearly_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\yearly_trends_of_blood_donor.png")
 
+    # calculating percentage contribution for every states in last year
     current_year = datetime.today().year
     data_2023 = malaysia_states_data[malaysia_states_data['date'].dt.year == current_year-1]
-    data_2023.head()
     annual_totals = data_2023.groupby('state')['daily'].sum()
     nation_total = data_2023['daily'].sum()
     percentage_contributions = (annual_totals / nation_total) * 100
@@ -278,6 +307,7 @@ try:
     data_percentage_contribution = pd.DataFrame(percentage_contributions)
     data_percentage_contribution=data_percentage_contribution.reset_index()
 
+    # standardized the naming for few states
     data_percentage_contribution.loc[data_percentage_contribution['state'] == 'Melaka', 'state'] = 'Malacca'
     data_percentage_contribution.loc[data_percentage_contribution['state'] == 'W.P. Kuala Lumpur', 'state'] = 'Kuala Lumpur'
     data_percentage_contribution.loc[data_percentage_contribution['state'] == 'Pulau Pinang', 'state'] = 'Penang'
@@ -311,9 +341,10 @@ try:
     highestState_index = data_percentage_contribution['daily'].idxmax()
     highest_percentage = data_percentage_contribution['daily'].max()
     state_name_highest = data_percentage_contribution.loc[highestState_index, 'state']
-    #saving our map as .png file.
+    # saving our map as .png file.
     pic_map_donor = fig.savefig('C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\map_donor_percentage_by_state.png')
 
+    # initialize photo path
     photo_paths = [
         "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\daily_trends_of_blood_donor_for_past_week.png",
         "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\weekly_trends_of_blood_donor_for_past_year.png",
@@ -323,20 +354,24 @@ try:
         "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\age_demographic_of_returning_donor.png"
     ]
 
+    # initialize caption 
     captions = [
-        f"The line area chart shows that there are trend of which days is the favourite blood donate day. which is {day_highest_value} with an average of {highest_value_daily}. Meanwhile {day_lowest_value} is the least likely people will donate their blood with an average of {lowest_value_daily}.",
-        f"{trend_interpretation_w} We can also see that there are outlier where on week {date_highest_donor_weekly} with {highest_donor_weekly_value} meanwhile on week {date_lowest_donor_weekly} is the lowest donor donation recorded with {lowest_donor_weekly_value}. This might be because there are seasonality such as public holiday in Malaysia. Further investigation needed.",
-        f"{trend_interpretation_m} We can also observed that there are month where on average, donors mostly donate blood on the month {monthly_highest_value_index} with {highest_value_monthly}. Meanwhile on month {monthly_lowest_value_index} with {lowest_value_monthly}.",
+        f"The line area chart shows that there are trend of which days is the favourite blood donate day. which is *{day_highest_value}* with an average of *{highest_value_daily}*. Meanwhile {day_lowest_value} is the least likely people will donate their blood with an average of {lowest_value_daily}.",
+        f"{trend_interpretation_w} We can also see that there are outlier where on year {current_year-1} week *{date_highest_donor_weekly}* with *{highest_donor_weekly_value}* meanwhile on week {date_lowest_donor_weekly} is the lowest donor donation recorded with {lowest_donor_weekly_value}. This might be because there are seasonality such as public holiday in Malaysia. Further investigation needed.",
+        f"{trend_interpretation_m} We can also observed that there are month where on average, donors mostly donate blood on the month {monthly_highest_value_index} with *{highest_value_monthly}*. Meanwhile on month {monthly_lowest_value_index} with {lowest_value_monthly}.",
         f"{trend_interpretation_y}",
-        f"Based on the map plot, we can see that {state_name_highest} have the highest percentage of donor for the year {current_year-1} contribute a total of {highest_percentage}%. Based on https://data.moh.gov.my/dashboard/blood-donation, the W.P Kuala Lumpur may be higher than the true donor rate (and Selangor lower) due to data from the National Blood Center's mobile campaigns around Selangor and W.P Putrajaya being recorded as data from W.P Kuala Lumpur.",
-        f"The age demographic shows that blood donor around the age {max_bin_edge} to {max_bin_edge+10} is the most frequent returning blood donor with {highest_frequency}. Percentage of people will donate their blood again is {percentage_return}% with out of {all_donor} donors, {returning_donor_count} donors coming back to repeat blood donation.",
+        f"Based on the map plot, we can see that {state_name_highest} have the highest percentage of donor for the year {current_year-1} contribute a total of *{highest_percentage}%*. Based on https://data.moh.gov.my/dashboard/blood-donation, the W.P Kuala Lumpur may be higher than the true donor rate (and Selangor lower) due to data from the National Blood Center's mobile campaigns around Selangor and W.P Putrajaya being recorded as data from W.P Kuala Lumpur.",
+        f"The age demographic shows that blood donor around the age {max_bin_edge} to {max_bin_edge+10} is the most frequent returning blood donor with {highest_frequency}. Percentage of people will donate their blood again is *{percentage_return}%*. Out of {all_donor} donors, *{returning_donor_count}* donors coming back to repeat blood donation.",
     ]
 
+    # for loop with python fucntion to send photo and their caption
     for photo_path, caption in zip(photo_paths, captions):
         send_photo(bot_token, chat_id, photo_path, caption)
+    # update log file
     file.write(f'{datetime.now()} - script successfully run \n')
     file.close()
 except Exception as e:
+    # update log file
     traceback.print_exc(file=file)
     file.write(f'{datetime.now()} - {e}\n')
     file.close()
