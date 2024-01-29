@@ -190,9 +190,6 @@ try:
 
     # PLOT MONTHLY DATA
 
-    # # Identify numeric columns excluding 'object' columns
-    # numeric_columns = copy_malaysia_data.select_dtypes(exclude='object').columns
-
     # Resample data and calculate monthly sum
     data_monthly = copy_malaysia_data[numeric_columns].resample('M').sum().reset_index()
     data_monthly_subset = data_monthly.tail(120)
@@ -250,9 +247,6 @@ try:
     pic_montly_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\monthly_trends_of_blood_donor_for_10_years.png")
 
     # PLOT YEARLY DATA
-
-    # # Identify numeric columns excluding 'object' columns
-    # numeric_columns = copy_malaysia_data.select_dtypes(exclude='object').columns
 
     # Resample data and calculate monthly mean
     data_yearly = copy_malaysia_data[numeric_columns].resample('Y').sum().reset_index()
