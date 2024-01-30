@@ -11,7 +11,13 @@ import traceback
 # open log file
 file = open(r'C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\telegram bot\\log.txt', 'a')
 # telegram bot token
-bot_token = "6905941845:AAEE8qD7HZ0GJYO5BT6kvoATAi1jFBFGF0g"
+file_path = "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\bot token.txt"
+
+# Open the file in read mode
+with open(file_path, 'r') as file:
+    # Read the contents of the file
+    file_contents = file.read()
+bot_token = file_contents
 # chat id for the group
 chat_id = "-4171022632"
 
