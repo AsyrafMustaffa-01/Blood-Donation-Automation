@@ -9,7 +9,7 @@ import numpy as np
 import traceback
 
 # open log file
-file = open(r'C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\telegram bot\\log.txt', 'a')
+log_file = open(r'C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\telegram bot\\log.txt', 'a')
 # telegram bot token
 file_path = "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\bot token.txt"
 
@@ -368,10 +368,10 @@ try:
     for photo_path, caption in zip(photo_paths, captions):
         send_photo(bot_token, chat_id, photo_path, caption)
     # update log file
-    file.write(f'{datetime.now()} - script successfully run \n')
-    file.close()
+    log_file.write(f'{datetime.now()} - script successfully run \n')
+    log_file.close()
 except Exception as e:
     # update log file
-    traceback.print_exc(file=file)
-    file.write(f'{datetime.now()} - {e}\n')
-    file.close()
+    traceback.print_exc(file=log_file)
+    log_file.write(f'{datetime.now()} - {e}\n')
+    log_file.close()
