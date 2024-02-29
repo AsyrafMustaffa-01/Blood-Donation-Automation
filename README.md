@@ -16,3 +16,10 @@ Then I automated all those process with Windows Task Scheduler with trigger dail
 ![image](https://github.com/AsyrafMustaffa-01/Blood-Donation-Automation/assets/155541067/d46712c9-4401-41a1-b3ff-c5e02c1544e9)
 
 Here is the snip of task scheduler configuration.
+
+## Results
+
+![image](https://github.com/AsyrafMustaffa-01/Blood-Donation-Automation/assets/155541067/dcf2c27f-2c80-4dc2-b522-62a34ebca85c)
+![image](https://github.com/AsyrafMustaffa-01/Blood-Donation-Automation/assets/155541067/e642a10e-12fc-42dc-9ff9-883deda1de66)
+
+Here is the snip of the end result, update to telegram group.
