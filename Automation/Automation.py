@@ -9,9 +9,11 @@ import numpy as np
 import traceback
 
 # open log file
-log_file = open(r'C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\telegram bot\\log.txt', 'a')
+log_file = open(r'C:\Users\LENOVO\Documents\github side project\Blood-Donation-Automation\telegram bot\log.txt', 'a')
 # telegram bot token
-file_path = "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\bot token.txt"
+file_path = r"C:\Users\LENOVO\Documents\github side project\Blood-Donation-Automation\bot token.txt"
+# visualization folder path
+viz_path = r"C:\Users\LENOVO\Documents\github side project\Blood-Donation-Automation\Visualization\\"
 
 # Open the file in read mode
 with open(file_path, 'r') as file:
@@ -36,7 +38,7 @@ def send_photo(bot_token, chat_id, photo_path, caption):
 # try catch sequence
 try:
     # Load the GeoJSON file
-    gdf_states = gpd.read_file("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\GeoJSON Malaysia\\malaysia_singapore_brunei_State level 1.geojson")
+    gdf_states = gpd.read_file(r"C:\Users\LENOVO\Documents\github side project\Blood-Donation-Automation\GeoJSON Malaysia\malaysia_singapore_brunei_State level 1.geojson")
     # raw data for daily donation
     daily_donation_data = pd.read_csv("https://raw.githubusercontent.com/MoH-Malaysia/data-darah-public/main/donations_state.csv")
     # raw data for returning donor
@@ -71,7 +73,7 @@ try:
     plt.ylabel("Frequency")
 
     # Save the histogram as a PNG image
-    plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\age_demographic_of_returning_donor.png")
+    plt.savefig(viz_path + r"age_demographic_of_returning_donor.png")
 
     # calculate percentage of donor return / all donor
     percentage_return = returning_donor_count / all_donor * 100
@@ -129,7 +131,7 @@ try:
     plt.ylabel("Daily Donors")
 
     # save plot
-    pic_daily_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\daily_trends_of_blood_donor_for_past_week.png")
+    pic_daily_trend = plt.savefig(viz_path + r"daily_trends_of_blood_donor_for_past_week.png")
 
     # PLOT WEEKLY DATA
 
@@ -192,7 +194,7 @@ try:
     plt.tight_layout()
 
     # Save plot
-    pic_weekly_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\weekly_trends_of_blood_donor_for_past_year.png")
+    pic_weekly_trend = plt.savefig(viz_path + r"weekly_trends_of_blood_donor_for_past_year.png")
 
     # PLOT MONTHLY DATA
 
@@ -250,7 +252,7 @@ try:
     plt.tight_layout()
 
     # save plot
-    pic_montly_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\monthly_trends_of_blood_donor_for_10_years.png")
+    pic_montly_trend = plt.savefig(viz_path + r"monthly_trends_of_blood_donor_for_10_years.png")
 
     # PLOT YEARLY DATA
 
@@ -295,7 +297,7 @@ try:
     plt.tight_layout()
 
     # save plot
-    pic_yearly_trend = plt.savefig("C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\yearly_trends_of_blood_donor.png")
+    pic_yearly_trend = plt.savefig(viz_path + r"yearly_trends_of_blood_donor.png")
 
     # calculating percentage contribution for every states in last year
     current_year = datetime.today().year
@@ -342,16 +344,16 @@ try:
     highest_percentage = data_percentage_contribution['daily'].max()
     state_name_highest = data_percentage_contribution.loc[highestState_index, 'state']
     # saving our map as .png file.
-    pic_map_donor = fig.savefig('C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\map_donor_percentage_by_state.png')
+    pic_map_donor = fig.savefig(viz_path + 'rmap_donor_percentage_by_state.png')
 
     # initialize photo path
     photo_paths = [
-        "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\daily_trends_of_blood_donor_for_past_week.png",
-        "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\weekly_trends_of_blood_donor_for_past_year.png",
-        "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\monthly_trends_of_blood_donor_for_10_years.png",
-        "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\yearly_trends_of_blood_donor.png",
-        "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\map_donor_percentage_by_state.png",
-        "C:\\Users\\PC\\OneDrive - Universiti Malaya\\Documents\\Github Project\\Blood-Donation-Automation\\Visualization\\age_demographic_of_returning_donor.png"
+        viz_path+r"daily_trends_of_blood_donor_for_past_week.png",
+        viz_path+r"weekly_trends_of_blood_donor_for_past_year.png",
+        viz_path+r"monthly_trends_of_blood_donor_for_10_years.png",
+        viz_path+r"yearly_trends_of_blood_donor.png",
+        viz_path+r"map_donor_percentage_by_state.png",
+        viz_path+r"age_demographic_of_returning_donor.png"
     ]
 
     # initialize caption 
